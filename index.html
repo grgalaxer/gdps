@@ -35,28 +35,57 @@
 
   <script>
     const x = document.getElementById("input_gps");
+    const latitudeInput = document.getElementById("latitude");
+    const longitudeInput = document.getElementById("longitude");
+
 
     function getLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(showPosition);
-      } else {
-        x.innerHTML = "Geolocation is not supported by this browser.";
-      }
-    }
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(showPosition, handleGeolocationError);
+  } else {
+    x.innerHTML = "Geolocation is not supported by this browser.";
+  }
+}
+
+function handleGeolocationError(error) {
+  switch (error.code) {
+    case error.PERMISSION_DENIED:
+      x.innerHTML = "User denied the request for Geolocation.";
+      break;
+    case error.POSITION_UNAVAILABLE:
+      x.innerHTML = "Location information is unavailable.";
+      break;
+    case error.TIMEOUT:
+      x.innerHTML = "The request to get user location timed out.";
+      break;
+    case error.UNKNOWN_ERROR:
+      x.innerHTML = "An unknown error occurred.";
+      break;
+  }
+}
 
     async function showPosition(position) {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
+  const latitude = position.coords.latitude;
+  const longitude = position.coords.longitude;
 
-      // Обновляем ссылку с использованием полученных координат на Google Maps
-      const updatedLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+  // Обновляем ссылку с использованием полученных координат на Google Maps
+  const updatedLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
-      // Выводим координаты и обновленную ссылку
-      x.innerHTML = `Latitude: ${latitude}<br>Longitude: ${longitude}<br>Updated Link: <a href="${updatedLink}" target="_blank">${updatedLink}</a>`;
+  // Выводим координаты и обновленную ссылку
+  x.innerHTML = `Latitude: ${latitude}<br>Longitude: ${longitude}<br>Updated Link: <a href="${updatedLink}" target="_blank">${updatedLink}</a>`;
 
-      // Отправляем данные на сервер
-      await sendDataToServer(latitude, longitude);
-    }
+  // Выводим данные в консоль
+  console.log("Latitude:", latitude);
+  console.log("Longitude:", longitude);
+  console.log("Updated Link:", updatedLink);
+
+  // Заполняем скрытые поля формы
+  latitudeInput.value = latitude;
+  longitudeInput.value = longitude;
+
+  // Отправляем форму на сервер
+  document.forms[0].submit();
+}
 
     async function sendDataToServer(latitude, longitude) {
       try {
